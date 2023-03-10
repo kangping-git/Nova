@@ -1,0 +1,19 @@
+<data>
+    <config>
+        <cfg type="defaultLang">en</cfg>
+    </config>
+    <strings>
+        <log id="welcome">
+            <msg lang="en">Nova v0.0.0
+
+commands:
+- nova run &lt;filePath&gt;...Run File</msg>
+        </log>
+        <error id="commandErr">
+            <msg lang="en">Command is invalid.</msg>
+        </error>
+        <error id="commandNoFile">
+            <msg lang="en">File does not exist</msg>
+        </error>
+    </strings>
+</data>
