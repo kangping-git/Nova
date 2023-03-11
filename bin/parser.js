@@ -25,7 +25,37 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parser = void 0;
 const switchPlus_1 = require("./switchPlus");
+const util = __importStar(require("./util"));
 const log = __importStar(require("./print"));
+let reservedWord = [
+    "func",
+    "if",
+    "else",
+    "for",
+    "while",
+    "return",
+    "break",
+    "continue",
+    "import",
+    "from",
+    "as",
+    "class",
+    "is",
+    "not",
+    "and",
+    "or",
+    "True",
+    "False",
+    "None",
+    "try",
+    "except",
+    "raise",
+    "finally",
+    "assert",
+    "yield",
+    "with",
+    "in",
+];
 function blockParser(tokens, option) {
     let astArray = [];
     while (tokens.length > 0) {
@@ -45,12 +75,12 @@ function blockParser(tokens, option) {
         }
         astArray.push(temp.ast);
     }
-    return astArray;
+    return { asts: astArray, option: option };
 }
 function $parser(tokens, option) {
     let tokenTemp = [...tokens];
     let backupToken = [...tokens];
-    let count = option.count;
+    let count = 0;
     function backupTokens() {
         backupToken = [...tokenTemp];
     }
@@ -88,6 +118,7 @@ function $parser(tokens, option) {
         },
         tokens: tokens.slice(1),
         count: count,
+        option: option,
     };
     let next = getNext2();
     if (next == undefined) {
@@ -99,6 +130,7 @@ function $parser(tokens, option) {
             },
             tokens: tokens.slice(1),
             count: count,
+            option: option,
         };
     }
     new switchPlus_1.s(next)
@@ -129,15 +161,24 @@ function $parser(tokens, option) {
                             }
                             arg.push(next);
                         }
+                        getNext();
                         backupTokens();
                         let args = [];
-                        for (let i in arg) {
+                        for (let i = 0; i < arg.length; i += 4) {
+                            if (arg[i].match(/^[a-zA-Z_][a-zA-Z0-9_]*$/)) {
+                                if (reservedWord.includes(arg[i])) {
+                                    util.output("reservedWord");
+                                }
+                                else {
+                                }
+                            }
                         }
                         let parsedCode = $parser(tokenTemp, option);
+                        astReturn.tokens = parsedCode.tokens;
                         setAst({
                             op: "func",
                             left: funcName,
-                            right: "",
+                            right: parsedCode.ast,
                         });
                     }
                 }
@@ -148,11 +189,40 @@ function $parser(tokens, option) {
                     left: "a",
                     right: "",
                 });
+                saveTokens();
         }
     })
-        .c("{", (value) => { });
+        .c("{", (value) => {
+        let depth = 1;
+        let token = [];
+        let i = 1;
+        for (; i < tokens.length; ++i) {
+            if (tokens[i] == "{") {
+                depth += 1;
+            }
+            else if (tokens[i] == "}") {
+                depth -= 1;
+                if (depth == 0) {
+                    break;
+                }
+            }
+            token.push(tokens[i]);
+        }
+        let $parsedBlock = blockParser(token, option);
+        astReturn.option = $parsedBlock.option;
+        astReturn.tokens = tokens.slice(i + 1);
+        setAst({
+            op: "system",
+            left: "block",
+            right: $parsedBlock.asts,
+        });
+    });
     if (astReturn.ast.op == "") {
-        log.error("Syntax Error:(lineAt:" + (option.line + 1) + ")");
+        log.error("Syntax Error:(" +
+            (option.line + 1) +
+            "," +
+            (option.count + 1) +
+            ")");
     }
     return astReturn;
 }
@@ -165,7 +235,8 @@ function parser(tokens) {
     while (tokens.length > 0) {
         let temp = $parser(tokens, option);
         tokens = temp.tokens;
-        option.count = temp.count;
+        option = temp.option;
+        option.count += temp.count;
         switch (temp.ast.op) {
             case "system":
                 switch (temp.ast.left) {

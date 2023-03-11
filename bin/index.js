@@ -48,7 +48,12 @@ else {
                         const token = lexer.lexer(fileData);
                         const astArray = parser.parser(token);
                         if (args.includes("--SaveCompiledFile")) {
-                            fs.writeFileSync(path.join(process.cwd(), args[1] + ".novac"), JSON.stringify(astArray));
+                            if (args.includes("--debug")) {
+                                fs.writeFileSync(path.join(process.cwd(), args[1] + ".json"), JSON.stringify(astArray, null, "    "));
+                            }
+                            else {
+                                fs.writeFileSync(path.join(process.cwd(), args[1] + ".novac"), JSON.stringify(astArray));
+                            }
                         }
                     }
                 });

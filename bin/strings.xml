@@ -15,5 +15,8 @@ commands:
         <error id="commandNoFile">
             <msg lang="en">File does not exist</msg>
         </error>
+        <error id="reservedWord">
+            <msg lang="en">Reserved words are not allowed</msg>
+        </error>
     </strings>
 </data>

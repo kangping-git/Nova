@@ -1,1 +1,1 @@
-[{"op":"test","left":"a","right":""},{"left":"line","op":"system","right":""},{"op":"test","left":"a","right":""},{"op":"test","left":"a","right":""},{"op":"test","left":"a","right":""}]
+[{"left":"line","op":"system","right":""},{"left":"line","op":"system","right":""},{"op":"func","left":"main","right":""},{"op":"system","left":"block","right":[]}]

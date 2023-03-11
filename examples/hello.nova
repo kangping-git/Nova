@@ -1,5 +1,6 @@
 // Hello,Worldと出力するプログラム
 
-func main() {
-    println("Hello,World")
+func main(){
+func main(){}
+
 }
