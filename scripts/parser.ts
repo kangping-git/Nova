@@ -6,6 +6,11 @@ interface obj {
     [key: string]: any;
 }
 
+interface arg {
+    type: string;
+    varName: string;
+}
+
 interface ast {
     left: string;
     op: string;
@@ -57,7 +62,13 @@ let reservedWord = [
     "yield",
     "with",
     "in",
+    "int",
+    "float",
+    "str",
+    "bool",
 ];
+
+let types = ["int", "float", "str", "bool"];
 
 function blockParser(tokens: string[], option: option): blockParserReturn {
     let astArray: ast[] = [];
@@ -176,20 +187,62 @@ function $parser(tokens: string[], option: option): $parserReturn {
                                 arg.push(next);
                             }
 
-                            getNext();
-
                             backupTokens();
 
-                            let args: obj[] = [];
+                            let args: arg[] = [];
 
-                            for (let i = 0; i < arg.length; i += 4) {
-                                if (arg[i].match(/^[a-zA-Z_][a-zA-Z0-9_]*$/)) {
-                                    if (reservedWord.includes(arg[i])) {
+                            for (let i = 0; i < arg.length; i += 3) {
+                                if (
+                                    arg[i + 1].match(/^[a-zA-Z_][a-zA-Z0-9_]*$/)
+                                ) {
+                                    if (reservedWord.includes(arg[i + 1])) {
                                         util.output("reservedWord");
                                     } else {
+                                        if (types.includes(arg[i])) {
+                                            args.push({
+                                                type: arg[i],
+                                                varName: arg[i + 1],
+                                            });
+                                        } else {
+                                            util.output("typeError");
+                                        }
+                                        if (i + 2 < arg.length) {
+                                            if (arg[i + 2] != ",") {
+                                                log.error(
+                                                    "Syntax Error:(" +
+                                                        (option.line + 1) +
+                                                        "," +
+                                                        (option.count + 1) +
+                                                        ")"
+                                                );
+                                            }
+                                        } else {
+                                            break;
+                                        }
                                     }
+                                } else {
+                                    log.error(
+                                        "Syntax Error:(" +
+                                            (option.line + 1) +
+                                            "," +
+                                            (option.count + 1) +
+                                            ")"
+                                    );
                                 }
                             }
+
+                            let returnType: string = "";
+
+                            if (getNext() == "->") {
+                                returnType = getNext();
+                                if (!types.includes(returnType)) {
+                                    util.output("typeError");
+                                }
+                            } else {
+                                returnBackupTokens();
+                            }
+
+                            getNext();
 
                             let parsedCode: $parserReturn = $parser(
                                 tokenTemp,
@@ -201,7 +254,11 @@ function $parser(tokens: string[], option: option): $parserReturn {
                             setAst({
                                 op: "func",
                                 left: funcName,
-                                right: parsedCode.ast,
+                                right: {
+                                    args: args,
+                                    returnType: returnType,
+                                    ast: parsedCode.ast,
+                                },
                             });
                         }
                     }

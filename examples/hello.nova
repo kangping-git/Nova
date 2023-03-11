@@ -1,6 +1,4 @@
 // Hello,Worldと出力するプログラム
 
-func main(){
-func main(){}
-
+func main(int data,int data2) -> str{
 }

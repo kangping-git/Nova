@@ -18,5 +18,8 @@ commands:
         <error id="reservedWord">
             <msg lang="en">Reserved words are not allowed</msg>
         </error>
+        <error id="typeError">
+            <msg lang="en">Type does not exist</msg>
+        </error>
     </strings>
 </data>

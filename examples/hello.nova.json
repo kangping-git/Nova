@@ -13,34 +13,28 @@
         "op": "func",
         "left": "main",
         "right": {
-            "op": "system",
-            "left": "block",
-            "right": [
+            "args": [
                 {
-                    "left": "line",
-                    "op": "system",
-                    "right": ""
+                    "type": "int",
+                    "varName": "data"
                 },
                 {
-                    "op": "func",
-                    "left": "main",
-                    "right": {
-                        "op": "system",
-                        "left": "block",
-                        "right": []
-                    }
-                },
-                {
-                    "left": "line",
-                    "op": "system",
-                    "right": ""
-                },
-                {
-                    "left": "line",
-                    "op": "system",
-                    "right": ""
+                    "type": "int",
+                    "varName": "data2"
                 }
-            ]
+            ],
+            "returnType": "str",
+            "ast": {
+                "op": "system",
+                "left": "block",
+                "right": [
+                    {
+                        "left": "line",
+                        "op": "system",
+                        "right": ""
+                    }
+                ]
+            }
         }
     }
 ]
